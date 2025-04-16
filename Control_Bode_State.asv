@@ -31,8 +31,6 @@ draw_step(T_feedback, 'Closed-Loop System T(s)');
 %--------Q5-------- locations of the poles
 draw_poles(T_feedback);
 
-%--------Q8-------- Ramp Response
-[ess, r_t_out, r_y_out] = draw_ramp(T_feedback, 700+200, 700);
 
 %-----Functions------
 
@@ -187,11 +185,11 @@ function [poles] = draw_poles(sys)
 end
 
 function [ess, t_out, y_out] = draw_ramp(sys, t_end, zoom_time)
-% DRAW_RAMP Plots ramp response in three subplots
+% DRAW_RAMP Plots and compares ramp response of a closed-loop system
 %   [ess, t_out, y_out] = draw_ramp(sys, t_end, zoom_time)
 %
 %   Inputs:
-%       sys - Closed-loop transfer function (tf object)
+%       closed_loop_sys - Closed-loop transfer function (tf object)
 %       t_end - End time for simulation (default: 100 sec)
 %       zoom_time - Time to zoom in (default: 700 sec)
 %
@@ -200,10 +198,9 @@ function [ess, t_out, y_out] = draw_ramp(sys, t_end, zoom_time)
 %       t_out - Time vector
 %       y_out - System response vector
 %
-%   Generates figure with three subplots:
-%       1. Ideal ramp input
-%       2. System response
-%       3. Zoomed comparison at specified time
+%   Generates:
+%       - Ramp response comparison plot
+%       - Zoomed-in view at specified time
 
     % Set defaults if not provided
     if nargin < 2
@@ -216,45 +213,25 @@ function [ess, t_out, y_out] = draw_ramp(sys, t_end, zoom_time)
     % Create time vector
     t = 0:0.1:t_end;
     
-    %getting the ramp
-    disp("Ramp TF:");
-    ramp = tf(1,[1 0])
-    
-    % Get response data
-    [y_sys, t_sys] = step(sys.*ramp, t);
-    [y_ideal, t_ideal] = step(ramp, t);
-    
-    % Create figure with three subplots
+    % Create ideal ramp input (1/s^2)
     figure;
-    
-    % Subplot 1: Ideal ramp input
-    subplot(3,1,1);
-    plot(t_ideal, y_ideal);
-    title('Ideal Ramp Input (r(t) = t)');
-    xlabel('Time (sec)');
-    ylabel('Amplitude');
-    grid on;
-    
-    % Subplot 2: System response
-    subplot(3,1,2);
-    plot(t_sys, y_sys);
-    title('System Ramp Response');
-    xlabel('Time (sec)');
-    ylabel('Amplitude');
-    grid on;
-    
-    % Subplot 3: Zoomed comparison
-    subplot(3,1,3);
-    plot(t_ideal, y_ideal, 'b');
+    step(tf(1,[1 0 0]), t);
     hold on;
-    plot(t_sys, y_sys, 'r--');
-    xlim([zoom_time-50 zoom_time+50]);
-    title(['Zoomed Comparison at t = ', num2str(zoom_time), ' sec']);
+    
+    % Plot system ramp response (Closed_Loop*(1/s))
+    step(closed_loop_sys*tf(1,[1 0]), t);
+    
+    % Format plot
+    title('Ramp Response Comparison');
     xlabel('Time (sec)');
     ylabel('Amplitude');
-    legend('Ideal', 'System', 'Location', 'northwest');
+    legend('Ideal Ramp Input', 'System Response', 'Location', 'northwest');
     grid on;
     hold off;
+    
+    % Get response data for error calculation
+    [y_sys, t_sys] = step(closed_loop_sys*tf(1,[1 0]), t);
+    [y_ideal, ~] = step(tf(1,[1 0 0]), t);
     
     % Calculate steady-state error (use last 10% of simulation)
     final_idx = round(0.9*length(t_sys)):length(t_sys);
@@ -262,6 +239,19 @@ function [ess, t_out, y_out] = draw_ramp(sys, t_end, zoom_time)
     
     % Display results
     disp(['Steady-state error (ess): ', num2str(ess)]);
+    
+    % Zoomed-in plot
+    figure;
+    step(tf(1,[1 0 0]), t);
+    hold on;
+    step(closed_loop_sys*tf(1,[1 0]), t);
+    xlim([zoom_time-50 zoom_time+50]);
+    title(['Ramp Response Zoom at t = ', num2str(zoom_time), ' sec']);
+    xlabel('Time (sec)');
+    ylabel('Amplitude');
+    legend('Ideal Ramp Input', 'System Response');
+    grid on;
+    hold off;
     
     % Return output data if requested
     if nargout > 1
