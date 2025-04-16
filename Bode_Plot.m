@@ -34,7 +34,10 @@ draw_poles(T_feedback);
 %--------Q8-------- Ramp Response
 [ess, r_t_out, r_y_out] = draw_ramp(T_feedback, 700+200, 700);
 
-%-----Functions------
+%--------Q9-------- Frequency Response
+[Gm, Pm, Wgc, Wpc] = draw_Bode_Plot(T_feedback);
+
+%-----------Functions------
 
 function [G_S, H_S] = create_system(num_G, den_G, num_H, den_H)
 % CREATE_SYSTEM Creates open-loop and feedback transfer functions
@@ -217,8 +220,7 @@ function [ess, t_out, y_out] = draw_ramp(sys, t_end, zoom_time)
     t = 0:0.1:t_end;
     
     %getting the ramp
-    disp("Ramp TF:");
-    ramp = tf(1,[1 0])
+    ramp = tf(1,[1 0]);
     
     % Get response data
     [y_sys, t_sys] = step(sys.*ramp, t);
@@ -228,23 +230,19 @@ function [ess, t_out, y_out] = draw_ramp(sys, t_end, zoom_time)
     figure;
     
     % Subplot 1: Ideal ramp input
-    subplot(3,1,1);
-    plot(t_ideal, y_ideal);
-    title('Ideal Ramp Input (r(t) = t)');
+    subplot(2,1,1);
+    plot(t_ideal, y_ideal, 'b');
+    hold on;
+    plot(t_sys, y_sys, 'r--');
+    title('Ramp Response');
     xlabel('Time (sec)');
     ylabel('Amplitude');
+    legend('Ideal', 'System', 'Location', 'northwest');
     grid on;
+    hold off;
     
-    % Subplot 2: System response
-    subplot(3,1,2);
-    plot(t_sys, y_sys);
-    title('System Ramp Response');
-    xlabel('Time (sec)');
-    ylabel('Amplitude');
-    grid on;
-    
-    % Subplot 3: Zoomed comparison
-    subplot(3,1,3);
+    % Subplot 2: Zoomed comparison
+    subplot(2,1,2);
     plot(t_ideal, y_ideal, 'b');
     hold on;
     plot(t_sys, y_sys, 'r--');
@@ -268,4 +266,31 @@ function [ess, t_out, y_out] = draw_ramp(sys, t_end, zoom_time)
         t_out = t_sys;
         y_out = y_sys;
     end
+end
+
+function [Gm, Pm, Wgc, Wpc] = draw_Bode_Plot(sys)
+% BODE_PLOT Analyzes system stability margins and compares margin() 
+%   Bode_Plot(sys)
+%
+%   Input:
+%       sys - Transfer function (tf object or state-space model)
+%   Outputs:
+%       Gm - Gain margin (dB)
+%       Pm - Phase margin (degrees)
+%       Wgc - Gain crossover frequency (rad/sec)
+%       Wpc - Phase crossover frequency (rad/sec)
+
+    % Create margin plot
+    figure;
+    margin(sys);
+    grid on;
+    
+    % Get stability margins
+    [Gm, Pm, Wgc, Wpc] = margin(sys);
+    
+    % Display results
+    disp(['=== Stability Margins for ' inputname(1) ' ===']);
+    disp(['Gain Margin: ', num2str(Gm), ' dB at ', num2str(Wgc), ' rad/s']);
+    disp(['Phase Margin: ', num2str(Pm), '° at ', num2str(Wpc), ' rad/s']);
+    
 end
