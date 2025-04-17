@@ -35,7 +35,7 @@ draw_poles(T_feedback);
 [ess, r_t_out, r_y_out] = draw_ramp(T_feedback, 700+200, 700);
 
 %--------Q9-------- Frequency Response
-[Gm, Pm, Wgc, Wpc] = draw_Bode_Plot(T_feedback);
+[Gm, Pm, Wgc, Wpc] = draw_Bode_Plot(G_S*H_S);
 
 %-----------Functions------
 
