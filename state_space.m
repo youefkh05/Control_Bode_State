@@ -1,7 +1,5 @@
-clc
-clear all
-close all
 
+%----------------State Space---------
 % Given system matrices
 A = [0 1; -6 -5];
 B = [0; 1];
@@ -163,6 +161,9 @@ pretty(x_forced_t)
 disp('Total state solution (unforced + forced):');
 pretty(x_total_t)
 
+disp('Total output solution (unforced + forced):');
+pretty(y_total_t)
+
 % Direct evaluation using subs()
 x1_vals = double(subs(x_total_t(1), t, t_vals));
 x2_vals = double(subs(x_total_t(2), t, t_vals));
@@ -235,7 +236,7 @@ desired_coeffs = sym2poly(desired_poly);
 
 K1 = desired_coeffs(3) - 6;  % From constant term
 K2 = desired_coeffs(2) - 5;  % From s term
-K = [K1 K2];
+K = [K1 K2]
 
 disp('Desired closed-loop poles:');
 disp([-sigma+1i*wd, -sigma-1i*wd]);
