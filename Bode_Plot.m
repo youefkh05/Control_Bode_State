@@ -246,7 +246,7 @@ function [ess, t_out, y_out] = draw_ramp(sys, t_end, zoom_time)
     plot(t_ideal, y_ideal, 'b');
     hold on;
     plot(t_sys, y_sys, 'r--');
-    xlim([zoom_time-50 zoom_time+50]);
+    xlim([zoom_time-5 zoom_time+5]);
     title(['Zoomed Comparison at t = ', num2str(zoom_time), ' sec']);
     xlabel('Time (sec)');
     ylabel('Amplitude');
