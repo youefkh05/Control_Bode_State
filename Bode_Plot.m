@@ -2,6 +2,7 @@ clc;
 clear;
 close all;
 
+%--------Bode Plot-----------
 %--------Q1--------  Define G(s) and H(s)
 % Define the open-loop transfer function G(s)
 num_G = 1;
@@ -36,6 +37,8 @@ draw_poles(T_feedback);
 
 %--------Q9-------- Frequency Response
 [Gm, Pm, Wgc, Wpc] = draw_Bode_Plot(G_S*H_S);
+
+
 
 %-----------Functions------
 

@@ -1,3 +1,6 @@
+clc; 
+clear;
+close all;
 
 %----------------State Space---------
 % Given system matrices
